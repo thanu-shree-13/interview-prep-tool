@@ -5,6 +5,7 @@ import Login from './pages/Login'
 import Home from './pages/Home'
 import Practice from './pages/Practice'
 import Dashboard from './pages/Dashboard'
+import Results from './pages/Results'
 
 function App() {
   const [user, setUser] = useState(null)
@@ -27,6 +28,7 @@ function App() {
         <Route path="/home" element={user ? <Home /> : <Navigate to="/" />} />
         <Route path="/practice" element={user ? <Practice /> : <Navigate to="/" />} />
         <Route path="/dashboard" element={user ? <Dashboard /> : <Navigate to="/" />} />
+        <Route path="/results" element={user ? <Results /> : <Navigate to="/" />} />
       </Routes>
     </BrowserRouter>
   )
