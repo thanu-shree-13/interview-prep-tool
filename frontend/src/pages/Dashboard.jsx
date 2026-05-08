@@ -13,7 +13,7 @@ export default function Dashboard() {
   const fetchSessions = async () => {
     try {
       const user = auth.currentUser
-      const res  = await axios.get(`http://localhost:5000/api/sessions/${user.uid}`)
+      const res  = await axios.get(`${process.env.REACT_APP_API_URL}/api/sessions/${user.uid}`)
       setSessions(res.data)
     } catch (err) {
       console.error(err)

@@ -41,7 +41,7 @@ export default function Results() {
   const generateSpokenAnswer = async (idx, item) => {
     setLoadingSpoken(prev => ({ ...prev, [idx]: true }))
     try {
-      const res = await axios.post('http://localhost:5000/api/questions/spoken-answer', {
+      const res = await axios.post('${process.env.REACT_APP_API_URL}/api/questions/spoken-answer', {
         question: item.question,
         idealAnswer: item.idealAnswer,
         missedPoints: item.missedPoints,
