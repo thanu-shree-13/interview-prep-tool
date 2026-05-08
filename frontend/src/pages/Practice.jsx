@@ -130,7 +130,7 @@ Return ONLY a JSON array with exactly 1 string. Example: ["Your follow-up questi
     setSpokenAnswer(null)
     setShowSpoken(false)
     try {
-      const res = await axios.post('${process.env.REACT_APP_API_URL}/api/questions/spoken-answer', {
+      const res = await axios.post(`${process.env.REACT_APP_API_URL}/api/questions/spoken-answer`, {
         question: questions[currentIndex],
         idealAnswer: feedbackData.idealAnswer,
         missedPoints: feedbackData.missedPoints,
