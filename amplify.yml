@@ -1,16 +1,23 @@
 version: 1
-frontend:
-  phases:
-    preBuild:
-      commands:
-        - npm install --prefix frontend
-    build:
-      commands:
-        - npm run build --prefix frontend
-  artifacts:
-    baseDirectory: frontend/build
-    files:
-      - '**/*'
-  cache:
-    paths:
-      - frontend/node_modules/**/*
+
+env:
+  variables:
+    REACT_APP_API_URL: "http://3.106.187.87:5000"
+
+applications:
+  - frontend:
+      phases:
+        preBuild:
+          commands:
+            - npm install
+        build:
+          commands:
+            - npm run build
+      artifacts:
+        baseDirectory: build
+        files:
+          - '**/*'
+      cache:
+        paths:
+          - node_modules/**/*
+      appRoot: frontend
