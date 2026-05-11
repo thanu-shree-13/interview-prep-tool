@@ -1,4 +1,7 @@
 version: 1
+env:
+  variables:
+    REACT_APP_API_URL: "http://3.106.187.87:5000"
 frontend:
   phases:
     preBuild:
