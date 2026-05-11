@@ -1,15 +1,12 @@
 version: 1
-env:
-  variables:
-    REACT_APP_API_URL: "http://3.106.187.87:5000"
 frontend:
   phases:
     preBuild:
       commands:
-        - cd frontend && npm install
+        - npm --prefix frontend install
     build:
       commands:
-        - cd frontend && npm run build
+        - npm --prefix frontend run build
   artifacts:
     baseDirectory: frontend/build
     files:
