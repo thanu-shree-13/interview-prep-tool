@@ -25,6 +25,7 @@ export default function Practice() {
   const location = useLocation()
   const navigate = useNavigate()
   const { role, difficulty, company } = location.state || {}
+  if (!location.state) { return null }
 
   const [questions, setQuestions] = useState([])
   const [currentIndex, setCurrentIndex] = useState(0)
