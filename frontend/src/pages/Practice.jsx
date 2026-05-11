@@ -40,18 +40,15 @@ export default function Practice() {
   const [timerActive, setTimerActive] = useState(false)
   const [speechCoach, setSpeechCoach] = useState(null)
 
-  // Spoken answer state
   const [spokenAnswer, setSpokenAnswer] = useState(null)
   const [loadingSpoken, setLoadingSpoken] = useState(false)
   const [showSpoken, setShowSpoken] = useState(false)
 
-  // 🆕 Follow-up state
   const [isFollowUp, setIsFollowUp] = useState(false)
   const [followUpTopic, setFollowUpTopic] = useState(null)
 
   const speakStartTime = useRef(null)
 
-  // ── Adaptive difficulty ──────────────────────────────────────────────────
   const [currentDifficulty, setCurrentDifficulty] = useState(difficulty)
   const [difficultyHistory, setDifficultyHistory] = useState([])
   const [difficultyChanged, setDifficultyChanged] = useState(null)
@@ -90,7 +87,6 @@ export default function Practice() {
     }
   }
 
-  // 🆕 Generate a single follow-up question on the weak topic
   const generateFollowUpQuestion = async (topic, previousQuestion) => {
     setLoading(true)
     try {
@@ -109,7 +105,6 @@ Return ONLY a JSON array with exactly 1 string. Example: ["Your follow-up questi
 
       const followUpQ = res.data.questions[0]
 
-      // inject follow-up question right after current index
       setQuestions(prev => {
         const updated = [...prev]
         updated.splice(currentIndex + 1, 0, followUpQ)
@@ -329,7 +324,6 @@ Return ONLY a JSON array with exactly 1 string. Example: ["Your follow-up questi
     setScoring(false)
   }
 
-  // ─── handleNext: adaptive difficulty + follow-up logic ───────────────────
   const handleNext = () => {
     setSpeechCoach(null)
     setSpokenAnswer(null)
@@ -363,7 +357,6 @@ Return ONLY a JSON array with exactly 1 string. Example: ["Your follow-up questi
         difficulty: nextDifficulty
       }])
 
-      // 🆕 if score < 6 and not already a follow-up, inject follow-up question
       if (feedback.score < 6 && feedback.nextFocus && !isFollowUp) {
         generateFollowUpQuestion(feedback.nextFocus, questions[currentIndex])
         setCurrentIndex(i => i + 1)
@@ -397,8 +390,10 @@ Return ONLY a JSON array with exactly 1 string. Example: ["Your follow-up questi
     navigate('/results', { state: { session, role, difficulty, company } })
   }
 
-const pct = (questions && questions.length) ? ((currentIndex + 1) / questions.length) * 100 : 0
+  const pct = (questions && questions.length) ? ((currentIndex + 1) / questions.length) * 100 : 0
   const color = feedback ? scoreColor(feedback.score) : '#8B5CF6'
+
+  // ── Guards ────────────────────────────────────────────────────────────────
 
   if (loading) return (
     <div style={s.loadingWrap}>
@@ -420,6 +415,18 @@ const pct = (questions && questions.length) ? ((currentIndex + 1) / questions.le
       <button style={s.errorBtn} onClick={() => navigate('/')}>Go Back</button>
     </div>
   )
+
+  // ── NEW GUARD: questions loaded but empty (backend returned bad data) ─────
+  if (!questions || questions.length === 0) return (
+    <div style={s.errorWrap}>
+      <style>{`@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');`}</style>
+      <p style={s.errorTitle}>Could not load questions</p>
+      <p style={s.errorSubtitle}>Your backend may be offline or returned no data. Please start your EC2 instance and try again.</p>
+      <button style={s.errorBtn} onClick={() => navigate('/')}>Go Back</button>
+    </div>
+  )
+
+  // ─────────────────────────────────────────────────────────────────────────
 
   return (
     <div style={s.root}>
@@ -477,7 +484,7 @@ const pct = (questions && questions.length) ? ((currentIndex + 1) / questions.le
           </div>
         )}
 
-        {/* 🆕 Follow-up notification banner */}
+        {/* Follow-up notification banner */}
         {isFollowUp && followUpTopic && (
           <div style={{
             display: 'flex', alignItems: 'center', gap: '10px',
@@ -742,7 +749,6 @@ const pct = (questions && questions.length) ? ((currentIndex + 1) / questions.le
               </div>
             )}
 
-            {/* 🆕 Follow-up hint when score is low */}
             {feedback.score < 6 && !isFollowUp && (
               <div style={{ background: 'rgba(251,191,36,0.06)', border: '1px solid rgba(251,191,36,0.2)', borderRadius: '10px', padding: '12px 14px' }}>
                 <p style={{ color: '#FBBF24', fontSize: '13px', margin: 0 }}>
@@ -769,7 +775,7 @@ const s = {
   loadingSubtitle: { fontSize: '14px', color: '#4A4A5A', margin: 0 },
   errorWrap: { minHeight: '100vh', background: '#0A0A0F', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '16px' },
   errorTitle: { fontSize: '20px', fontWeight: '600', color: '#F87171', margin: 0 },
-  errorSubtitle: { fontSize: '14px', color: '#4A4A5A', margin: 0 },
+  errorSubtitle: { fontSize: '14px', color: '#4A4A5A', margin: 0, textAlign: 'center', maxWidth: '360px' },
   errorBtn: { marginTop: '8px', padding: '12px 28px', borderRadius: '10px', border: 'none', background: 'linear-gradient(135deg, #8B5CF6, #6366F1)', color: '#fff', fontSize: '14px', fontWeight: '600', cursor: 'pointer' },
   header: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '18px 32px', borderBottom: '1px solid rgba(255,255,255,0.06)', background: 'rgba(10,10,15,0.9)', backdropFilter: 'blur(12px)', position: 'sticky', top: 0, zIndex: 10 },
   roleLabel: { fontSize: '15px', fontWeight: '600', color: '#E8E8F0', letterSpacing: '-0.01em' },
