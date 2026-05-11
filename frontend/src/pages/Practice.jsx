@@ -24,7 +24,11 @@ function scoreEmoji(score) {
 export default function Practice() {
   const location = useLocation()
   const navigate = useNavigate()
-  const { role, difficulty, company } = location.state || {}
+
+  // FIX 1: Safe destructuring with optional chaining
+  const role = location.state?.role
+  const difficulty = location.state?.difficulty
+  const company = location.state?.company
 
   const [questions, setQuestions] = useState([])
   const [currentIndex, setCurrentIndex] = useState(0)
@@ -52,14 +56,17 @@ export default function Practice() {
   const [difficultyHistory, setDifficultyHistory] = useState([])
   const [difficultyChanged, setDifficultyChanged] = useState(null)
 
+  // FIX 2: Depend on role/difficulty, redirect if missing
   useEffect(() => {
-    if (!location.state) { navigate('/'); return }
-    if (!role || !difficulty) { navigate('/'); return }
+    if (!role || !difficulty) {
+      navigate('/')
+      return
+    }
     generateQuestions()
-  }, [])
+  }, [role, difficulty])
 
   useEffect(() => {
-    if (questions.length > 0 && !feedback) {
+    if (Array.isArray(questions) && questions.length > 0 && !feedback) {
       setTimeLeft(120)
       setTimerActive(true)
     }
@@ -79,7 +86,8 @@ export default function Practice() {
   const generateQuestions = async () => {
     try {
       const res = await axios.post(`${process.env.REACT_APP_API_URL}/api/questions/generate`, { role, difficulty, company })
-      setQuestions(res.data.questions)
+      // FIX 3: Validate backend response before setting state
+      setQuestions(Array.isArray(res.data.questions) ? res.data.questions : [])
     } catch (err) {
       setError('Failed to load questions. Please check your connection and try again.')
     } finally {
@@ -103,7 +111,9 @@ Return ONLY a JSON array with exactly 1 string. Example: ["Your follow-up questi
         customPrompt: prompt
       })
 
-      const followUpQ = res.data.questions[0]
+      // FIX 4: Validate follow-up response before using it
+      const followUpQ = Array.isArray(res.data.questions) ? res.data.questions[0] : null
+      if (!followUpQ) return
 
       setQuestions(prev => {
         const updated = [...prev]
@@ -390,7 +400,10 @@ Return ONLY a JSON array with exactly 1 string. Example: ["Your follow-up questi
     navigate('/results', { state: { session, role, difficulty, company } })
   }
 
-  const pct = (questions && questions.length) ? ((currentIndex + 1) / questions.length) * 100 : 0
+  // FIX 5: Safe length check using optional chaining
+  const pct = (Array.isArray(questions) && questions.length)
+    ? ((currentIndex + 1) / questions.length) * 100
+    : 0
   const color = feedback ? scoreColor(feedback.score) : '#8B5CF6'
 
   // ── Guards ────────────────────────────────────────────────────────────────
@@ -416,8 +429,7 @@ Return ONLY a JSON array with exactly 1 string. Example: ["Your follow-up questi
     </div>
   )
 
-  // ── NEW GUARD: questions loaded but empty (backend returned bad data) ─────
-  if (!questions || questions.length === 0) return (
+  if (!Array.isArray(questions) || questions.length === 0) return (
     <div style={s.errorWrap}>
       <style>{`@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');`}</style>
       <p style={s.errorTitle}>Could not load questions</p>
@@ -471,7 +483,7 @@ Return ONLY a JSON array with exactly 1 string. Example: ["Your follow-up questi
         {/* Step dots */}
         {questions.length > 0 && (
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '32px' }}>
-            {questions.map((_, i) => (
+            {questions?.map((_, i) => (
               <React.Fragment key={i}>
                 <div style={{
                   width: '8px', height: '8px', borderRadius: '50%', flexShrink: 0,
@@ -785,7 +797,7 @@ const s = {
   questionCard: { background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '16px', padding: '32px 36px', marginBottom: '24px', position: 'relative', overflow: 'hidden' },
   questionLabel: { fontSize: '11px', fontWeight: '700', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#8B5CF6', marginBottom: '16px' },
   questionText: { fontSize: '19px', lineHeight: '1.65', color: '#E8E8F0', fontWeight: '400', margin: 0, letterSpacing: '-0.01em' },
-  textarea: { width: '100%', minHeight: '148px', padding: '18px 20px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.03)', color: '#E8E8F0', fontSize: '15px', lineHeight: '1.65', outline: 'none', resize: 'vertical', boxSizing: 'border-box', fontFamily: "'DM Sans', sans-serif", transition: 'border-color 0.2s' },
+  textarea: { width: '100%', minHeight: '148px', padding: '18px 20px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.04)', color: '#E8E8F0', fontSize: '15px', lineHeight: '1.65', outline: 'none', resize: 'vertical', boxSizing: 'border-box', fontFamily: "'DM Sans', sans-serif", transition: 'border-color 0.2s' },
   speechCard: { background: 'rgba(139,92,246,0.08)', border: '1px solid rgba(139,92,246,0.2)', borderRadius: '10px', padding: '16px 18px' },
   feedbackCard: { background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '16px', padding: '32px 36px', display: 'flex', flexDirection: 'column', gap: '20px' },
   feedbackLabel: { fontSize: '11px', fontWeight: '700', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#4A4A5A', marginBottom: '8px', margin: 0 },
