@@ -80,7 +80,7 @@ export default function Practice() {
 
   const generateQuestions = async () => {
     try {
-      const res = await axios.post('${process.env.REACT_APP_API_URL}/api/questions/generate', { role, difficulty, company })
+      const res = await axios.post(`${process.env.REACT_APP_API_URL}/api/questions/generate`, { role, difficulty, company })
       setQuestions(res.data.questions)
     } catch (err) {
       setError('Failed to load questions. Please check your connection and try again.')
@@ -99,7 +99,7 @@ They need more practice on this topic: "${topic}"
 Generate a slightly simpler question that helps them understand "${topic}" better.
 Return ONLY a JSON array with exactly 1 string. Example: ["Your follow-up question here"]`
 
-      const res = await axios.post('${process.env.REACT_APP_API_URL}/api/questions/generate', {
+      const res = await axios.post(`${process.env.REACT_APP_API_URL}/api/questions/generate`, {
         role,
         difficulty: currentDifficulty,
         company,
@@ -305,7 +305,7 @@ Return ONLY a JSON array with exactly 1 string. Example: ["Your follow-up questi
     setTimerActive(false)
     setScoring(true)
     try {
-      const res = await axios.post('${process.env.REACT_APP_API_URL}/api/questions/score', {
+      const res = await axios.post(`${process.env.REACT_APP_API_URL}/api/questions/score`, {
         question: questions[currentIndex], answer
       })
       const data = res.data
@@ -384,7 +384,7 @@ Return ONLY a JSON array with exactly 1 string. Example: ["Your follow-up questi
   const saveSession = async () => {
     try {
       const user = auth.currentUser
-      await axios.post('${process.env.REACT_APP_API_URL}/api/sessions/save', {
+      await axios.post(`${process.env.REACT_APP_API_URL}/api/sessions/save`, {
         userId: user.uid, userEmail: user.email,
         role, difficulty, company,
         questions: session,
