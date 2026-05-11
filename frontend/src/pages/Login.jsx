@@ -4,11 +4,11 @@ import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   signInWithPopup,
-  signInWithRedirect,
-  sendPasswordResetEmail,
   GoogleAuthProvider,
 } from 'firebase/auth'
 import { useNavigate } from 'react-router-dom'
+
+const googleProvider = new GoogleAuthProvider()
 
 const css = `
 @import url('https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&display=swap');
@@ -52,8 +52,7 @@ html, body { height: 100%; background: var(--bg); }
 }
 
 .lp-card-head {
-  padding: 28px 28px 22px;
-  border-bottom: 1px solid var(--border);
+  padding: 28px 28px 0;
 }
 
 .lp-logo {
@@ -95,6 +94,8 @@ html, body { height: 100%; background: var(--bg); }
   font-size: 13.5px;
   color: var(--text-2);
   line-height: 1.5;
+  margin-bottom: 0;
+  padding-bottom: 22px;
 }
 
 .lp-card-body {
@@ -206,17 +207,6 @@ html, body { height: 100%; background: var(--bg); }
 
 .lp-error svg { flex-shrink: 0; margin-top: 1px; }
 
-.lp-info {
-  background: #f0fdf4;
-  border: 1px solid #bbf7d0;
-  border-radius: var(--radius-sm);
-  padding: 9px 11px;
-  margin-bottom: 14px;
-  color: #166534;
-  font-size: 12.5px;
-  line-height: 1.5;
-}
-
 .lp-submit {
   width: 100%;
   padding: 10px 16px;
@@ -243,7 +233,7 @@ html, body { height: 100%; background: var(--bg); }
   border: 1.5px solid rgba(255,255,255,0.25);
   border-top-color: #fff;
   border-radius: 50%;
-  animation: lp-spin 0.6s linear infinite;
+  animation: spin 0.6s linear infinite;
   vertical-align: middle;
   margin-right: 7px;
 }
@@ -253,7 +243,7 @@ html, body { height: 100%; background: var(--bg); }
   border-top-color: rgba(0,0,0,0.5);
 }
 
-@keyframes lp-spin { to { transform: rotate(360deg); } }
+@keyframes spin { to { transform: rotate(360deg); } }
 
 .lp-toggle {
   text-align: center;
@@ -276,11 +266,9 @@ html, body { height: 100%; background: var(--bg); }
 @media (max-width: 480px) {
   .lp { padding: 16px; align-items: flex-start; padding-top: 40px; }
   .lp-card-body { padding: 18px 20px 24px; }
-  .lp-card-head { padding: 22px 20px 18px; }
+  .lp-card-head { padding: 22px 20px 0; }
 }
 `
-
-const googleProvider = new GoogleAuthProvider()
 
 const LogoIcon = () => (
   <svg width="15" height="15" viewBox="0 0 16 16" fill="none">
@@ -300,9 +288,7 @@ const GoogleIcon = () => (
 
 const WarnIcon = () => (
   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <circle cx="12" cy="12" r="10"/>
-    <line x1="12" y1="8" x2="12" y2="12"/>
-    <line x1="12" y1="16" x2="12.01" y2="16"/>
+    <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
   </svg>
 )
 
@@ -311,7 +297,6 @@ export default function Login() {
   const [password, setPassword] = useState('')
   const [isSignup, setIsSignup] = useState(false)
   const [error, setError]       = useState('')
-  const [info, setInfo]         = useState('')
   const [loading, setLoading]   = useState(false)
   const [gLoading, setGLoading] = useState(false)
   const navigate = useNavigate()
@@ -329,52 +314,29 @@ export default function Login() {
 
   const handleSubmit = async () => {
     if (!email || !password) { setError('Please fill in all fields.'); return }
-    setLoading(true); setError(''); setInfo('')
+    setLoading(true); setError('')
     try {
       isSignup
         ? await createUserWithEmailAndPassword(auth, email, password)
         : await signInWithEmailAndPassword(auth, email, password)
       navigate('/home')
-    } catch (err) {
-      setError(fmtErr(err.message))
-    }
+    } catch (err) { setError(fmtErr(err.message)) }
     setLoading(false)
   }
 
   const handleGoogle = async () => {
-    setGLoading(true); setError(''); setInfo('')
+    setGLoading(true); setError('')
     try {
       await signInWithPopup(auth, googleProvider)
       navigate('/home')
     } catch (err) {
-      // If popup is blocked, fall back to redirect
-      if (err.code === 'auth/popup-blocked' || err.code === 'auth/popup-closed-by-user') {
-        try {
-          await signInWithRedirect(auth, googleProvider)
-          // Page will redirect; no further action needed
-        } catch (redirectErr) {
-          setError(fmtErr(redirectErr.message))
-        }
-      } else if (err.code !== 'auth/cancelled-popup-request') {
-        setError(fmtErr(err.message))
-      }
+      if (err.code !== 'auth/popup-closed-by-user') setError(fmtErr(err.message))
     }
     setGLoading(false)
   }
 
-  const handleForgotPassword = async () => {
-    if (!email) { setError('Enter your email address above, then click Forgot password.'); return }
-    setError(''); setInfo('')
-    try {
-      await sendPasswordResetEmail(auth, email)
-      setInfo('Password reset email sent. Check your inbox.')
-    } catch (err) {
-      setError(fmtErr(err.message))
-    }
-  }
-
   const onKey  = e => { if (e.key === 'Enter') handleSubmit() }
-  const toggle = () => { setIsSignup(p => !p); setError(''); setInfo('') }
+  const toggle = () => { setIsSignup(p => !p); setError('') }
 
   return (
     <div className="lp">
@@ -435,9 +397,7 @@ export default function Login() {
             <div className="lp-row-label">
               <label className="lp-label">Password</label>
               {!isSignup && (
-                <button className="lp-forgot" onClick={handleForgotPassword}>
-                  Forgot password?
-                </button>
+                <button className="lp-forgot" onClick={() => {}}>Forgot password?</button>
               )}
             </div>
             <input
@@ -458,19 +418,8 @@ export default function Login() {
             </div>
           )}
 
-          {/* Info */}
-          {info && (
-            <div className="lp-info">
-              {info}
-            </div>
-          )}
-
           {/* Submit */}
-          <button
-            className="lp-submit"
-            onClick={handleSubmit}
-            disabled={loading || gLoading}
-          >
+          <button className="lp-submit" onClick={handleSubmit} disabled={loading || gLoading}>
             {loading && <span className="lp-spin" />}
             {loading ? 'Please wait…' : isSignup ? 'Create account' : 'Sign in'}
           </button>

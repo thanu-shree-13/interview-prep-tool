@@ -396,7 +396,7 @@ Return ONLY a JSON array with exactly 1 string. Example: ["Your follow-up questi
     navigate('/results', { state: { session, role, difficulty, company } })
   }
 
-  const pct = questions.length ? ((currentIndex + 1) / questions.length) * 100 : 0
+const pct = (questions && questions.length) ? ((currentIndex + 1) / questions.length) * 100 : 0
   const color = feedback ? scoreColor(feedback.score) : '#8B5CF6'
 
   if (loading) return (
