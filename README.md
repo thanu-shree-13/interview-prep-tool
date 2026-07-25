@@ -13,7 +13,7 @@ An AI-powered interview preparation platform built with React, Node.js, MongoDB,
 - Frontend: React
 - Backend: Node.js + Express
 - Database: MongoDB Atlas
-- AI: Google Gemini API
+- AI: Grok API
 - Auth: Firebase
 - Deployment: AWS (EC2 + Amplify)
 
