@@ -2,8 +2,6 @@
 
 An AI-powered mock interview platform that helps you practice for technical interviews. Pick a role, answer questions out loud or by typing, and get AI-driven feedback on both your content and your speaking pace — with difficulty that adapts based on how well you're answering.
 
-**Demo:** Live deployment was on AWS free tier and has since been turned off to avoid charges. A recorded walkthrough is available: _add your video link here_
-
 ## Features
 
 - **Role-based question generation** — Select a job role (e.g. Full Stack Developer) and company/difficulty tags; questions are generated dynamically via the Grok API instead of pulled from a static bank.
@@ -113,14 +111,3 @@ Per-question breakdown with strong points, missed points, and a generated model 
 ### Progress Dashboard
 Tracks average score, weak topics, and performance by role over time.
 ![Progress dashboard](Screenshots/08_progress_dashboard.png)
-
-## Roadmap / Possible Improvements
-
-- [ ] Add unit tests for scoring logic
-- [ ] Rate limiting on the backend API
-- [ ] Support for more roles/domains beyond the current set
-- [ ] Downloadable session report (PDF)
-
-## License
-
-_Add a license if you plan to make this public (MIT is a common default for student projects)._
