@@ -2,8 +2,6 @@
 
 An AI-powered mock interview platform that helps you practice for technical interviews. Pick a role, answer questions out loud or by typing, and get AI-driven feedback on both your content and your speaking pace — with difficulty that adapts based on how well you're answering.
 
-**Live demo:** _add your Amplify URL here_
-
 ## Features
 
 - **Role-based question generation** — Select a job role (e.g. Full Stack Developer) and company/difficulty tags; questions are generated dynamically via the Grok API instead of pulled from a static bank.
@@ -85,13 +83,31 @@ An AI-powered mock interview platform that helps you practice for technical inte
 
 The app should now be running locally, with the frontend calling the backend API.
 
-## Roadmap / Possible Improvements
+## Screenshots
 
-- [ ] Add unit tests for scoring logic
-- [ ] Rate limiting on the backend API
-- [ ] Support for more roles/domains beyond the current set
-- [ ] Downloadable session report (PDF)
+### Sign In
+![Sign in screen](screenshots/01_signin.png)
 
-## License
+### Role & Difficulty Selection
+Select a role, company, and difficulty — or type a custom role. Difficulty auto-adjusts based on performance during the session.
+![Role and difficulty selection](screenshots/02_role_selection.png)
 
-_Add a license if you plan to make this public (MIT is a common default for student projects)._
+### Practice — Voice or Typed Answers
+Answer by speaking or typing directly.
+![Question with voice recording](screenshots/03_question_voice.png)
+![Question with typed answer](screenshots/05_question_typed_answer.png)
+
+### Speech Coach Analysis
+Real-time feedback on speaking pace, filler words, and stutters.
+![Speech coach analysis](screenshots/04_speech_coach_analysis.png)
+
+### AI Scoring & Feedback
+![AI score and feedback](screenshots/06_ai_score_feedback.png)
+
+### Detailed Results
+Per-question breakdown with strong points, missed points, and a generated model answer.
+![Detailed results](screenshots/07_results_detailed_feedback.png)
+
+### Progress Dashboard
+Tracks average score, weak topics, and performance by role over time.
+![Progress dashboard](screenshots/08_progress_dashboard.png)
